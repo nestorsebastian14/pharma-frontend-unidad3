@@ -1,0 +1,9 @@
+@if (mostrarAviso()) {
+  <div class="aviso" role="status">
+    <span>Su sesión vence en <strong>{{ tiempoFormateado() }}</strong>.</span>
+    <div class="acciones">
+      <button type="button" class="btn-cerrar-sesion" (click)="cerrarSesionAhora()">Cerrar sesión ahora</button>
+      <button type="button" class="btn-x" (click)="ocultarAviso()" aria-label="Cerrar aviso">×</button>
+    </div>
+  </div>
+}

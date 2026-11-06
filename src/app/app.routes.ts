@@ -52,6 +52,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/clientes/clientes.routes').then(m => m.CLIENTES_ROUTES),
       },
+      // <-- NUEVA RUTA AGREGADA -->
+      {
+        path: 'mi-cuenta',
+        title: 'Mi cuenta',
+        loadComponent: () => import('./features/auth/pages/mi-cuenta/mi-cuenta').then(m => m.MiCuenta),
+      },
       {
         path: 'acceso-denegado',
         title: 'Acceso denegado',

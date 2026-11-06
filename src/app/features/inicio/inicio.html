@@ -3,3 +3,15 @@
     <p>Seleccione un módulo en el menú lateral para comenzar.</p>
     <a routerLink="/categorias" class="btn btn-primary">Ir a Categorías</a>
 </section>
+
+@if (auth.tienePermiso('REPORTES_VER')) {
+  @defer (on viewport) {
+    <app-mas-vendidos />
+  } @placeholder {
+    <p class="card">Productos más vendidos</p>
+  } @loading (minimum 300ms) {
+    <p class="card">Cargando reporte…</p>
+  } @error {
+    <p class="alerta">No se pudo cargar el reporte.</p>
+  }
+}

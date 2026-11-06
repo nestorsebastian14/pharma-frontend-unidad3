@@ -1,0 +1,17 @@
+.tarjeta {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  max-width: 600px;
+  margin-top: 16px;
+}
+.info-basica { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
+.info-basica h3 { margin: 0 0 8px 0; color: #0f2e5c; }
+.seccion { margin-bottom: 20px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip-rol { background: #e3f2fd; color: #1565c0; padding: 4px 12px; border-radius: 16px; font-weight: 600; font-size: 14px; }
+.lista-permisos { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lista-permisos li { background: #f1f8e9; padding: 6px 10px; border-radius: 6px; color: #2e7d32; font-size: 14px; }
+.alerta-warning { background: #fff3cd; color: #856404; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #ffc107; }
+.alerta-error { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; }

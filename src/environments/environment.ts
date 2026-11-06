@@ -1,3 +1,5 @@
+// Producción: la SPA y el API se sirven desde el mismo origen (Nginx), por eso la URL es relativa.
 export const environment = {
-    apiUrl: 'http://localhost:8080/api/v1',
+  production: true,
+  apiUrl: '/api/v1',
 };

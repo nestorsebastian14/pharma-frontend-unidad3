@@ -1,0 +1,44 @@
+<section class="page">
+  <header class="page-header">
+    <h2>Mi Cuenta</h2>
+  </header>
+
+  @if (permisosCambiaron()) {
+    <div class="alerta-warning">
+      Sus permisos cambiaron. Cierre sesión y vuelva a ingresar para actualizarlos.
+    </div>
+  }
+
+  @if (cargando()) {
+    <p>Cargando sus datos...</p>
+  } @else if (error()) {
+    <div class="alerta-error">{{ error() }}</div>
+  } @else if (perfil(); as p) {
+    <div class="tarjeta">
+      <div class="info-basica">
+        <h3>{{ p.nombreCompleto }}</h3>
+        <p><strong>Usuario:</strong> {{ p.username }}</p>
+      </div>
+
+      <div class="seccion">
+        <h4>Roles asignados:</h4>
+        <div class="chips">
+          @for (rol of p.roles; track rol) {
+            <span class="chip chip-rol">{{ rol }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h4>Permisos (según el servidor):</h4>
+        <ul class="lista-permisos">
+          @for (permiso of p.permisos; track permiso) {
+            <li>✓ {{ permiso }}</li>
+          } @empty {
+            <li>No tiene permisos asignados.</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</section>

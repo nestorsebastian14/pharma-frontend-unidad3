@@ -6,9 +6,11 @@
         <a href="http://localhost:8080/swagger-ui.html" target="_blank" rel="noopener">API</a>
     </nav>
     @if (auth.sesion(); as s) {
-    <div class="usuario">
+    <div class="usuario" style="display: flex; align-items: center;">
         <span class="nombre">{{ s.nombreCompleto }}</span>
         <span class="detalle">{{ s.roles.join(' · ') }} · expira {{ s.expiraEn | date: 'HH:mm' }}</span>
+        <!-- ENLACE A MI CUENTA -->
+        <a routerLink="/mi-cuenta" class="btn-mi-cuenta">Mi cuenta</a>
     </div>
     <button type="button" class="btn-salir" (click)="salir()">Cerrar sesión</button>
     }
