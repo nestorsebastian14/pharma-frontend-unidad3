@@ -1,12 +1,11 @@
-import { inject, Service } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators'; // Asegúrate de que esta línea esté
 import { environment } from '../../../../environments/environment';
 import { PaginaResponse } from '../../../core/models/pagina-response';
 import { Direccion, OrdenProducto, Producto, ProductoRequest } from '../models/producto.model';
 
-@Service()
+@Injectable({providedIn: 'root'})
 export class ProductoService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/productos`;
@@ -23,27 +22,7 @@ export class ProductoService {
       .set('ordenarPor', ordenarPor)
       .set('direccion', direccion);
 
-    return this.http.get<any>(this.url, { params }).pipe(
-      map((respuesta) => {
-        let listaProductos: Producto[] = [];
-
-        if (Array.isArray(respuesta)) {
-          listaProductos = respuesta;
-        } else if (respuesta && respuesta.content) {
-          listaProductos = respuesta.content;
-        }
-
-        const paginaMapeada: any = {
-          contenido: listaProductos,
-          totalElementos: listaProductos.length,
-          totalPaginas: Math.ceil(listaProductos.length / tamanio),
-          pagina: pagina,
-          ultima: (pagina + 1) >= Math.ceil(listaProductos.length / tamanio)
-        };
-
-        return paginaMapeada;
-      })
-    );
+    return this.http.get<PaginaResponse<Producto>>(this.url, { params });
   }
 
   obtener(id: number): Observable<Producto> {

@@ -14,14 +14,7 @@
         }
       </select>
     </label>
-    <label>
-      Por página
-      <select class="input" [value]="tamanio()" (change)="cambiarTamanio($any($event.target).value)">
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-      </select>
-    </label>
+
   </div>
 
   @if (error()) {
@@ -31,7 +24,7 @@
   @if (cargando()) {
     <p>Cargando productos…</p>
   } @else {
-    <table class="tabla">
+    <table class="tabla" data-testid="tabla-productos">
       <thead>
         <tr>
           <th><button type="button" class="orden" (click)="ordenar('nombre')">Nombre</button></th>
@@ -66,11 +59,9 @@
     </table>
 
     @if (resultado(); as r) {
-      <footer class="paginador">
-        <span>Página {{ r.pagina + 1 }} de {{ r.totalPaginas || 1 }} · {{ r.totalElementos }} productos</span>
-        <button type="button" class="btn" [disabled]="r.pagina === 0" (click)="irA(r.pagina - 1)">Anterior</button>
-        <button type="button" class="btn" [disabled]="r.ultima" (click)="irA(r.pagina + 1)">Siguiente</button>
-      </footer>
+      <app-paginador [pagina]="r.pagina" [totalPaginas]="r.totalPaginas"
+       [totalElementos]="r.totalElementos" [tamanio]="r.tamanio"
+       (cambioPagina)="irA($event)" (cambioTamanio)="cambiarTamanio(''+$event)" />
     }
   }
 </section>

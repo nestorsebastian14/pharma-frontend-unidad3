@@ -1,11 +1,11 @@
-import { inject, Service } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { PaginaResponse } from '../../../core/models/pagina-response';
 import { FiltroVentas, Venta, VentaRequest } from '../models/venta.model';
 
-@Service()
+@Injectable({providedIn: 'root'})
 export class VentaService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/ventas`;

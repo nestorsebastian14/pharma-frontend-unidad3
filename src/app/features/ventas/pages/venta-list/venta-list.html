@@ -68,11 +68,9 @@
         }
       </tbody>
     </table>
-    <footer class="paginador">
-      <span class="solo-impresion">Total registrado en la página (sin anuladas): {{ totalPagina() | currency: 'PEN' : 'S/ ' }} · </span>
-      <span>Página {{ r.pagina + 1 }} de {{ r.totalPaginas || 1 }} · {{ r.totalElementos }} ventas</span>
-      <button type="button" class="btn no-imprimir" [disabled]="r.pagina === 0" (click)="irA(r.pagina - 1)">Anterior</button>
-      <button type="button" class="btn no-imprimir" [disabled]="r.ultima" (click)="irA(r.pagina + 1)">Siguiente</button>
-    </footer>
+    <p class="solo-impresion">Total registrado en esta página: {{ totalPagina() | currency: 'PEN' : 'S/ ' }}</p>
+    <app-paginador [pagina]="r.pagina" [totalPaginas]="r.totalPaginas"
+       [totalElementos]="r.totalElementos" [tamanio]="r.tamanio"
+       (cambioPagina)="irA($event)" (cambioTamanio)="cambiarTamanio($event)" />
   }
 </section>

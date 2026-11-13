@@ -1,7 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Paginador } from '../../../../shared/components/paginador/paginador';
 import { PaginaResponse } from '../../../../core/models/pagina-response';
 import { mensajeError } from '../../../../core/utils/http-error';
 import { SiPermiso } from '../../../../shared/directives/si-permiso';
@@ -13,19 +14,21 @@ import { ProductoService } from '../../services/producto-service';
 
 @Component({
   selector: 'app-producto-list',
-  imports: [RouterLink, SiPermiso, CurrencyPipe],
+  imports: [RouterLink, SiPermiso, CurrencyPipe, Paginador],
   templateUrl: './producto-list.html',
   styleUrl: './producto-list.css',
 })
 export class ProductoList implements OnInit {
   private readonly productoService = inject(ProductoService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly categoriaService = inject(CategoriaService);
   private readonly auth = inject(AuthService);
   protected readonly puedeEscribir = computed(() => this.auth.tienePermiso('CATALOGO_ESCRIBIR'));
 
   // Estado de la consulta paginada
   protected readonly pagina = signal(0);
-  protected readonly tamanio = signal(10);
+  protected readonly tamanio = signal(20);
   protected readonly ordenarPor = signal<OrdenProducto>('nombre');
   protected readonly direccion = signal<Direccion>('asc');
 
@@ -47,7 +50,13 @@ export class ProductoList implements OnInit {
       next: datos => this.categorias.set(datos),
       error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
     });
-    this.cargar();
+    this.route.queryParamMap.subscribe(q => {
+      this.pagina.set(Math.max(0, Number(q.get('pagina') ?? 0) || 0));
+      this.tamanio.set([10,20,50,100].includes(Number(q.get('tamanio'))) ? Number(q.get('tamanio')) : 20);
+      this.ordenarPor.set((['nombre','precio','stock'].includes(q.get('orden') ?? '') ? q.get('orden') : 'nombre') as OrdenProducto);
+      this.direccion.set(q.get('dir') === 'desc' ? 'desc' : 'asc');
+      this.cargar();
+    });
   }
 
   cargar(): void {
@@ -68,13 +77,11 @@ export class ProductoList implements OnInit {
   }
 
   irA(pagina: number): void {
-    this.pagina.set(pagina);
-    this.cargar();
+    this.navegar({pagina});
   }
 
   cambiarTamanio(valor: string): void {
-    this.tamanio.set(Number(valor));
-    this.irA(0);
+    this.navegar({tamanio:Number(valor),pagina:0});
   }
 
   ordenar(campo: OrdenProducto): void {
@@ -84,7 +91,11 @@ export class ProductoList implements OnInit {
       this.ordenarPor.set(campo);
       this.direccion.set('asc');
     }
-    this.irA(0);
+    this.navegar({orden:this.ordenarPor(), dir:this.direccion(),pagina:0});
+  }
+
+  private navegar(cambios: Record<string,string|number>):void {
+    this.router.navigate([], {relativeTo:this.route,queryParams:cambios,queryParamsHandling:'merge'});
   }
 
   filtrarPorCategoria(valor: string): void {

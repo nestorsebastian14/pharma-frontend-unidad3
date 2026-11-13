@@ -2,7 +2,8 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Paginador } from '../../../../shared/components/paginador/paginador';
 import { PaginaResponse } from '../../../../core/models/pagina-response';
 import { mensajeError } from '../../../../core/utils/http-error';
 import { SiPermiso } from '../../../../shared/directives/si-permiso';
@@ -13,18 +14,21 @@ import { VentaService } from '../../services/venta-service';
 
 @Component({
   selector: 'app-venta-list',
-  imports: [ReactiveFormsModule, RouterLink, SiPermiso, CurrencyPipe, DatePipe],
+  imports: [ReactiveFormsModule, RouterLink, SiPermiso, CurrencyPipe, DatePipe, Paginador],
   templateUrl: './venta-list.html',
   styleUrl: './venta-list.css',
 })
 export class VentaList implements OnInit {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly ventaService = inject(VentaService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly clienteService = inject(ClienteService);
 
   protected readonly clientes = signal<Cliente[]>([]);
   protected readonly resultado = signal<PaginaResponse<Venta> | null>(null);
   protected readonly pagina = signal(0);
+  protected readonly tamanio = signal(20);
   protected readonly cargando = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -66,7 +70,14 @@ export class VentaList implements OnInit {
       next: p => this.clientes.set(p.contenido),
       error: (err: HttpErrorResponse) => this.error.set(mensajeError(err)),
     });
-    this.cargar();
+    this.route.queryParamMap.subscribe(q => {
+      this.pagina.set(Math.max(0,Number(q.get('pagina')??0)||0));
+      this.tamanio.set([10,20,50,100].includes(Number(q.get('tamanio'))) ? Number(q.get('tamanio')) : 20);
+      this.filtros.patchValue({clienteId:q.get('clienteId')?Number(q.get('clienteId')):null,
+        estado:(q.get('estado') || null) as EstadoVenta | null,
+        desde:q.get('desde')||null,hasta:q.get('hasta')||null},{emitEvent:false});
+      this.cargar();
+    });
   }
 
   buscar(): void {
@@ -75,8 +86,9 @@ export class VentaList implements OnInit {
       this.error.set('La fecha «desde» no puede ser posterior a la fecha «hasta».');
       return;
     }
-    this.pagina.set(0);
-    this.cargar();
+    const f=this.filtros.getRawValue();
+    this.router.navigate([], {relativeTo:this.route,queryParams:{pagina:0,clienteId:f.clienteId,
+      estado:f.estado,desde:f.desde,hasta:f.hasta},queryParamsHandling:'merge'});
   }
 
   limpiar(): void {
@@ -85,15 +97,18 @@ export class VentaList implements OnInit {
   }
 
   irA(pagina: number): void {
-    this.pagina.set(pagina);
-    this.cargar();
+    this.router.navigate([], {relativeTo:this.route,queryParams:{pagina},queryParamsHandling:'merge'});
+  }
+
+  cambiarTamanio(tamanio:number):void {
+    this.router.navigate([], {relativeTo:this.route,queryParams:{tamanio,pagina:0},queryParamsHandling:'merge'});
   }
 
   private cargar(): void {
     const filtro: FiltroVentas = this.filtros.getRawValue();
     this.cargando.set(true);
     this.error.set(null);
-    this.ventaService.buscar(filtro, this.pagina(), 10).subscribe({
+    this.ventaService.buscar(filtro, this.pagina(), this.tamanio()).subscribe({
       next: r => {
         this.resultado.set(r);
         this.cargando.set(false);

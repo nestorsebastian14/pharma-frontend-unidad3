@@ -1,9 +1,9 @@
-import { inject, Service } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Categoria, CategoriaRequest } from '../models/categoria.model';
-@Service()
+@Injectable({providedIn: 'root'})
 export class CategoriaService {
     private readonly http = inject(HttpClient);
     private readonly url = `${environment.apiUrl}/categorias`;

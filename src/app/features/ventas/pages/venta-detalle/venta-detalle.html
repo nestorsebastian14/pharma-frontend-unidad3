@@ -65,6 +65,12 @@
         <p>Documento interno sin valor tributario · Impreso el {{ fechaImpresion | date: 'dd/MM/yyyy HH:mm' }}</p>
       </footer>
 
+      @defer (on viewport) {
+        <app-indicaciones-comprobante />
+      } @placeholder {
+        <span class="no-imprimir" aria-hidden="true"></span>
+      }
+
       <div class="acciones no-imprimir">
         <a routerLink="/ventas" class="btn">Volver a la consulta</a>
         <a routerLink="/ventas/nueva" class="btn">Nueva venta</a>
